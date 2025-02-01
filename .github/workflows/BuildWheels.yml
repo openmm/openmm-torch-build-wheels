@@ -77,10 +77,12 @@ jobs:
           mkdir build
           cd build
           export SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
+          which hipcc
           cmake .. \
             -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
             -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
             -DTorch_DIR=${SITE_PACKAGES}/torch/share/cmake/Torch \
+            -DCMAKE_CXX_COMPILER=hipcc \
             -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
             -DCMAKE_CUDA_ARCHITECTURES=OFF \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
@@ -92,7 +94,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd openmm-torch/build
-          make install
+          make -j4 install
           make -j4 PythonInstall
 
       - name: "Fix RPATHs"

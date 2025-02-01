@@ -1,4 +1,4 @@
-openmm[cuda12]
+openmm[cuda12,hip6]
 pybind11
 cmake
 swig
