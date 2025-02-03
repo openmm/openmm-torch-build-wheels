@@ -46,7 +46,7 @@ jobs:
 
       - name: "Install dependencies with yum"
         run: |
-          yum -y install zip opencl-headers ocl-icd
+          yum -y install zip opencl-headers ocl-icd gcc
 
       - name: "Install HIP"
         run: |
