@@ -78,6 +78,7 @@ jobs:
           mkdir buildhip
           cd buildhip
           export SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
+          export PYTORCH_ROCM_ARCH=gfx10-1-generic
           cmake .. \
             -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
             -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
@@ -88,7 +89,6 @@ jobs:
             -DCMAKE_CUDA_ARCHITECTURES=OFF \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
             -DCMAKE_CUDA_HOST_COMPILER=/opt/rocm/bin/amdclang \
-            -DPYTORCH_ROCM_ARCH=gfx10-1-generic \
             -DNN_BUILD_CUDA_LIB=OFF \
             -DNN_BUILD_OPENCL_LIB=OFF
 
