@@ -1,4 +1,3 @@
-openmm[cuda12,hip6]
 pybind11
 cmake
 swig
@@ -7,4 +6,3 @@ delocate
 wheel
 auditwheel
 setuptools
-torch
