@@ -110,8 +110,8 @@ jobs:
             -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang \
             -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ \
             -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
-            -DNN_BUILD_CUDA_LIB = OFF \
-            -DNN_BUILD_OPENCL_LIB = OFF
+            -DNN_BUILD_CUDA_LIB=OFF \
+            -DNN_BUILD_OPENCL_LIB=OFF
 
       - name: "Build OpenMM-Torch for HIP"
         shell: bash -l {0}
