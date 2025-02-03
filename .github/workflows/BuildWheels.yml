@@ -48,14 +48,6 @@ jobs:
         run: |
           yum -y install zip opencl-headers ocl-icd
 
-      - name: "Install CUDA"
-        run: |
-          dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel8/${{ matrix.cuda-arch }}/cuda-rhel8.repo
-          dnf -y install cuda-compiler-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
-                         cuda-libraries-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
-                         cuda-libraries-devel-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
-                         cuda-nvtx-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }}
-
       - name: "Install HIP"
         run: |
           yum install -y epel-release
@@ -69,6 +61,38 @@ jobs:
           git checkout $GIT_REVISION
           git apply $GITHUB_WORKSPACE/devtools/patches/cxx11_abi.patch
           git apply $GITHUB_WORKSPACE/devtools/patches/extras_require.patch
+
+      - name: "Configure build with CMake for HIP"
+        shell: bash -l {0}
+        run: |
+          cd openmm-torch
+          mkdir buildhip
+          cd buildhip
+          export SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
+          cmake .. \
+            -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
+            -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
+            -DTorch_DIR=${SITE_PACKAGES}/torch/share/cmake/Torch \
+            -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang \
+            -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ \
+            -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
+            -DNN_BUILD_CUDA_LIB=OFF \
+            -DNN_BUILD_OPENCL_LIB=OFF \
+            -DNN_BUILD_PYTHON_WRAPPERS=OFF
+
+      - name: "Build OpenMM-Torch for HIP"
+        shell: bash -l {0}
+        run: |
+          cd openmm-torch/buildhip
+          make -j4 install
+
+      - name: "Install CUDA"
+        run: |
+          dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel8/${{ matrix.cuda-arch }}/cuda-rhel8.repo
+          dnf -y install cuda-compiler-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
+                         cuda-libraries-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
+                         cuda-libraries-devel-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }} \
+                         cuda-nvtx-${{ matrix.cuda-version }}.${{ matrix.cuda-arch }}
 
       - name: "Configure build with CMake"
         shell: bash -l {0}
@@ -95,33 +119,6 @@ jobs:
           cd openmm-torch/build
           make -j4 install
           make -j4 PythonInstall
-
-      - name: "Configure build with CMake for HIP"
-        shell: bash -l {0}
-        run: |
-          cd openmm-torch
-          mkdir buildhip
-          cd buildhip
-          export SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
-          cmake .. \
-            -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
-            -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
-            -DTorch_DIR=${SITE_PACKAGES}/torch/share/cmake/Torch \
-            -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang \
-            -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ \
-            -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
-            -DCMAKE_CUDA_ARCHITECTURES=OFF \
-            -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
-            -DCMAKE_CUDA_HOST_COMPILER=/opt/rocm/bin/amdclang \
-            -DCUDAToolkit_ROOT= \
-            -DNN_BUILD_CUDA_LIB=OFF \
-            -DNN_BUILD_OPENCL_LIB=OFF
-
-      - name: "Build OpenMM-Torch for HIP"
-        shell: bash -l {0}
-        run: |
-          cd openmm-torch/buildhip
-          make -j4 install
 
       - name: "Fix RPATHs"
         shell: bash -l {0}
