@@ -113,6 +113,7 @@ jobs:
             -DCMAKE_CUDA_ARCHITECTURES=OFF \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
             -DCMAKE_CUDA_HOST_COMPILER=/opt/rocm/bin/amdclang \
+            -DCUDAToolkit_ROOT= \
             -DNN_BUILD_CUDA_LIB=OFF \
             -DNN_BUILD_OPENCL_LIB=OFF
 
