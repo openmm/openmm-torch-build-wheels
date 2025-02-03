@@ -81,12 +81,11 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
             -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
             -DTorch_DIR=${SITE_PACKAGES}/torch/share/cmake/Torch \
-            -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang \
-            -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ \
             -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
             -DCMAKE_CUDA_ARCHITECTURES=OFF \
             -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc \
             -DCMAKE_CUDA_HOST_COMPILER=c++ \
+            -DNN_BUILD_HIP_LIB=OFF \
             -DOPENCL_INCLUDE_DIR=/usr/include/CL \
             -DOPENCL_LIBRARY=/usr/lib64/libOpenCL.so.1
 
@@ -96,6 +95,29 @@ jobs:
           cd openmm-torch/build
           make -j4 install
           make -j4 PythonInstall
+
+      - name: "Configure build with CMake for HIP"
+        shell: bash -l {0}
+        run: |
+          cd openmm-torch
+          mkdir buildhip
+          cd buildhip
+          export SITE_PACKAGES=$(python -c 'import site; print(site.getsitepackages()[0])')
+          cmake .. \
+            -DCMAKE_INSTALL_PREFIX=${SITE_PACKAGES}/OpenMM.libs \
+            -DOPENMM_DIR=${SITE_PACKAGES}/OpenMM.libs \
+            -DTorch_DIR=${SITE_PACKAGES}/torch/share/cmake/Torch \
+            -DCMAKE_C_COMPILER=/opt/rocm/bin/amdclang \
+            -DCMAKE_CXX_COMPILER=/opt/rocm/bin/amdclang++ \
+            -DCMAKE_CXX_FLAGS='-D_GLIBCXX_USE_CXX11_ABI=0 -Wl,--allow-shlib-undefined' \
+            -DNN_BUILD_CUDA_LIB = OFF \
+            -DNN_BUILD_OPENCL_LIB = OFF
+
+      - name: "Build OpenMM-Torch for HIP"
+        shell: bash -l {0}
+        run: |
+          cd openmm-torch/buildhip
+          make -j4 install
 
       - name: "Fix RPATHs"
         shell: bash -l {0}
