@@ -49,7 +49,7 @@ jobs:
           yum -y install zip opencl-headers ocl-icd
           dnf update
           dnf clean all
-          dnf group install "Development Tools"
+          dnf -y group install "Development Tools"
 
       - name: "Install HIP"
         run: |
