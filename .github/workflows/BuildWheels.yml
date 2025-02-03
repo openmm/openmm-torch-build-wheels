@@ -47,6 +47,9 @@ jobs:
       - name: "Install dependencies with yum"
         run: |
           yum -y install zip opencl-headers ocl-icd
+          dnf update
+          dnf clean all
+          dnf -y group install "Development Tools"
 
       - name: "Install HIP"
         run: |
