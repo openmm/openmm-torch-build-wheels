@@ -351,9 +351,7 @@ jobs:
           cd build
           for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[0])"`) do set SITE_PACKAGES=%%v
           set SITE_PACKAGES
-          ls %SITE_PACKAGES%\torch
-          ls %SITE_PACKAGES%\torch\share
-          ls %SITE_PACKAGES%\torch\share\cmake
+          ls %SITE_PACKAGES%
           cmake -G "NMake Makefiles JOM" ^
             -DCMAKE_INSTALL_PREFIX=%SITE_PACKAGES%/OpenMM.libs ^
             -DOPENMM_DIR=%SITE_PACKAGES%/OpenMM.libs ^
