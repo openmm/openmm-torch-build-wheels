@@ -349,9 +349,12 @@ jobs:
           cd openmm-torch
           mkdir build
           cd build
-          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[0])"`) do set SITE_PACKAGES=%%v
+          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[-1])"`) do set SITE_PACKAGES=%%v
           set SITE_PACKAGES
-          ls %SITE_PACKAGES%
+          dir "%SITE_PACKAGES%"
+          dir "%SITE_PACKAGES%\torch"
+          dir "%SITE_PACKAGES%\torch\share"
+          dir "%SITE_PACKAGES%\torch\share\cmake"
           cmake -G "NMake Makefiles JOM" ^
             -DCMAKE_INSTALL_PREFIX=%SITE_PACKAGES%/OpenMM.libs ^
             -DOPENMM_DIR=%SITE_PACKAGES%/OpenMM.libs ^
@@ -380,7 +383,7 @@ jobs:
           set CUDA_VERSION=%FULL_CUDA_VERSION:~0,2%
           pip wheel -w dist .
           cd dist
-          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[0])"`) do set SITE_PACKAGES=%%v
+          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[-1])"`) do set SITE_PACKAGES=%%v
           python %GITHUB_WORKSPACE%\devtools\scripts\add_plugins_and_headers.py "%SITE_PACKAGES%\OpenMM.libs" "Torch" "!CUDA" "!HIP"
 
       - name: "Build CUDA wheel"
@@ -394,7 +397,7 @@ jobs:
           set CUDA_VERSION=%FULL_CUDA_VERSION:~0,2%
           pip wheel -w dist .
           cd dist
-          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[0])"`) do set SITE_PACKAGES=%%v
+          for /f "usebackq delims==" %%v in (`python -c "import site; print(site.getsitepackages()[-1])"`) do set SITE_PACKAGES=%%v
           python %GITHUB_WORKSPACE%\devtools\scripts\add_plugins_and_headers.py "%SITE_PACKAGES%\OpenMM.libs" "Torch" "CUDA"
           move openmm_torch*.whl %GITHUB_WORKSPACE%\openmm-torch\build\python\dist
 #
