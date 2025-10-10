@@ -326,7 +326,7 @@ jobs:
         with:
           cuda: ${{matrix.cuda-version}}
           method: 'network'
-#          sub-packages: '["nvcc", "nvrtc", "nvrtc_dev", "cufft", "cufft_dev", "opencl", "cudart", "cuda_profiler_api"]'
+          sub-packages: '["nvcc", "nvrtc", "nvrtc_dev", "cufft", "cufft_dev", "opencl", "cudart", "cuda_profiler_api"]'
 
 #      - name: "Install HIP"
 #        shell: cmd /C call {0}
